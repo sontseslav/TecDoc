@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TecDoc:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TecDoc_jar</output-path>
+    <root id="archive" name="TecDoc.jar">
+      <element id="module-output" name="TecDoc" />
+      <element id="library" level="project" name="mysql-connector-java-5.1.20-bin" />
+      <element id="library" level="project" name="tbjdbc" />
+    </root>
+  </artifact>
+</component>
