@@ -13,21 +13,23 @@ public class ParallelSummarise{
             int val1,val2;
             try{
                 while(true){
-                    boolean isResultPresent = rs.next();
-                    if(!isResultPresent){
-                        break;
+                    synchronized(this){
+                        boolean isResultPresent = rs.next();
+                        if (!isResultPresent) {
+                            break;
+                        }
+                        val1 = rs.getInt(1);
+                        val2 = rs.getInt(2);
+                        ps.setNull(1, Types.INTEGER);
+                        ps.setLong(2, val1 + val2);
+                        ps.setBoolean(3, false);
+                        ps.executeUpdate();
+                        if ((rowsSet % 5000) == 0 && rowsSet != 0) {
+                            System.out.println(Thread.currentThread().getName() + " : " + rowsSet);
+                            //conn.commit();
+                        }
+                        rowsSet++;
                     }
-                    val1 = rs.getInt(1);
-                    val2 = rs.getInt(2);
-                    ps.setNull(1, Types.INTEGER);
-                    ps.setLong(2, val1 + val2);
-                    ps.setBoolean(3, false);
-                    ps.executeUpdate();
-                    if((rowsSet % 5000) == 0 && rowsSet !=0){
-                        System.out.println(Thread.currentThread().getName()+" : "+rowsSet);
-                        //conn.commit();
-                    }
-                    rowsSet++;
                 }
                 /*while(rs.next()){
                     val1 = rs.getInt(1);
@@ -46,7 +48,7 @@ public class ParallelSummarise{
             }catch (SQLException e){e.printStackTrace();}
         }
     }
-    volatile private PreparedStatement ps;
+    private PreparedStatement ps;
     volatile private ResultSet rs;
     private Connection conn;
     volatile private int rowsSet;
