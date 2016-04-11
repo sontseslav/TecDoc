@@ -2,6 +2,8 @@ package concur.dbconctest;
 
 import java.sql.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by coder on 10.04.16.
@@ -11,15 +13,19 @@ public class ParallelSummarise{
         @Override
         public void run(){
             int val1,val2;
-            try{
+            
                 while(true){
-                    synchronized(this){
+                    //synchronized(this){
+                    lock.lock();
+                    try{
                         boolean isResultPresent = rs.next();
                         if (!isResultPresent) {
                             break;
                         }
                         val1 = rs.getInt(1);
                         val2 = rs.getInt(2);
+                        lock.unlock();
+                        lock.lock();
                         ps.setNull(1, Types.INTEGER);
                         ps.setLong(2, val1 + val2);
                         ps.setBoolean(3, false);
@@ -29,7 +35,12 @@ public class ParallelSummarise{
                             //conn.commit();
                         }
                         rowsSet++;
+                    }catch(SQLException e){
+                        e.printStackTrace();
+                    }finally{
+                        lock.unlock();
                     }
+                    //}
                 }
                 /*while(rs.next()){
                     val1 = rs.getInt(1);
@@ -45,17 +56,18 @@ public class ParallelSummarise{
                     rowsSet++;
                 }*/
                 isNext = false;
-            }catch (SQLException e){e.printStackTrace();}
+            
         }
     }
-    private PreparedStatement ps;
-    volatile private ResultSet rs;
-    private Connection conn;
-    volatile private int rowsSet;
+    private final PreparedStatement ps;
+    private final ResultSet rs;
+    private final Connection conn;
+    private int rowsSet;
     private final int corePoolSize = 5;
     private final int maxPoolSize = 10;
     private final long keepAliveTime = 5000;
     private boolean isNext = true;
+    private final Lock lock = new ReentrantLock();
 
     public ParallelSummarise(Connection conn, PreparedStatement ps, ResultSet rs){
         this.conn = conn;
