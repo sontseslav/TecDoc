@@ -9,9 +9,36 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by coder on 10.04.16.
  */
 public class ParallelSummarise{
-    private class Task implements Runnable{
+    private class Container{
+        private long sum;
+        public Container(int val1, int val2){
+            this.sum = val1+val2;
+        }
+        public long getSum(){
+            return this.sum;
+        }
+    }
+    
+    private class TaskFillQueue implements Runnable{
+        /**
+         Only one thread, no obvious blocking is needed
+         */
         @Override
         public void run(){
+            int counter = 0;
+            try{
+                while (rs.next()) {
+                    int val1 = rs.getInt(1);
+                    int val2 = rs.getInt(2);
+                    containerQueue.put(new Container(val1, val2));
+                    System.out.println(++counter + " objects added to container");
+                }
+            }catch(SQLException | InterruptedException e){e.printStackTrace();}
+        }
+    }
+    private class Task implements Runnable{
+        @Override
+        public void run(){//runs 138 k miliseconds
             int val1,val2;
             
                 while(true){
@@ -61,13 +88,15 @@ public class ParallelSummarise{
     }
     private final PreparedStatement ps;
     private final ResultSet rs;
-    private final Connection conn;
-    private int rowsSet;
+    private final Connection conn;//is it needed?
     private final int corePoolSize = 5;
     private final int maxPoolSize = 10;
     private final long keepAliveTime = 5000;
-    private boolean isNext = true;
     private final Lock lock = new ReentrantLock();
+    private BlockingQueue<Container> containerQueue = new ArrayBlockingQueue<>(1024);
+    private int rowsSet;
+    private boolean isNext = true;
+    
 
     public ParallelSummarise(Connection conn, PreparedStatement ps, ResultSet rs){
         this.conn = conn;
