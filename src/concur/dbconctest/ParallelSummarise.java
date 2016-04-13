@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ParallelSummarise{
     private class Container{
-        private long sum;
+        private final long sum;
         public Container(int val1, int val2){
             this.sum = val1+val2;
         }
@@ -40,7 +40,6 @@ public class ParallelSummarise{
                 while(!containerQueue.isEmpty()){
                     Thread.sleep(1000);
                 }
-                
             }catch(SQLException | InterruptedException e){e.printStackTrace();}
             isNext = false;
             System.out.println(Thread.currentThread().getName() + " terminated");
@@ -53,7 +52,7 @@ public class ParallelSummarise{
      */
         @Override
         public void run(){
-            while (!containerQueue.isEmpty() | isNext) {
+            while (!containerQueue.isEmpty()) {
                 boolean updated;
                 int counter;
                 try {
@@ -88,8 +87,8 @@ public class ParallelSummarise{
     private final int maxPoolSize = 10;
     private final long keepAliveTime = 5000;
     private final Lock lock = new ReentrantLock();
-    private BlockingQueue<Container> containerQueue = new ArrayBlockingQueue<>(10000);
-    private AtomicInteger rowsSet = new AtomicInteger(0);
+    private final BlockingQueue<Container> containerQueue = new ArrayBlockingQueue<>(10000);
+    private final AtomicInteger rowsSet = new AtomicInteger(0);
     private boolean isNext = true;
     
 
