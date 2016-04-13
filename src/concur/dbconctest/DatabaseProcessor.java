@@ -104,10 +104,10 @@ public class DatabaseProcessor {
                         rowsSet++;
                     }*/
                     ParallelSummarise parallelSummarise = new ParallelSummarise(conn,prepStat,rs);
-                    parallelSummarise.start();
-                    try {
+                    parallelSummarise.exec();
+                    /*try {
                         parallelSummarise.join();
-                    }catch(InterruptedException e){e.printStackTrace();}
+                    }catch(InterruptedException e){e.printStackTrace();}*/
                     rs.close();
                 }
             } catch (SQLException e) {
