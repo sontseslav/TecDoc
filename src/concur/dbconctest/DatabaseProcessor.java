@@ -85,8 +85,8 @@ public class DatabaseProcessor {
                 String queryCreateTable = "CREATE TABLE " + OUTPUT_TABLE + " (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         "SUM BIGINT NOT NULL, is_palindrome bool NOT NULL)";
                 st.execute(queryCreateTable);
-                String queryInsertValues = "INSERT INTO "+OUTPUT_TABLE+" VALUES (?,?,?)";
-                try(PreparedStatement prepStat = conn.prepareStatement(queryInsertValues)){
+                String queryInsertValues = "INSERT INTO "+OUTPUT_TABLE+" (SUM, is_palindrome) VALUES (?,?)";
+                //try(PreparedStatement prepStat = conn.prepareStatement(queryInsertValues)){
                     ResultSet rs = st.executeQuery("SELECT val1, val2 FROM "+INPUT_TABLE);
                     //ResultSetMetaData rsm = rs.getMetaData();
                     /*int rowsSet =0;
@@ -103,13 +103,13 @@ public class DatabaseProcessor {
                         }
                         rowsSet++;
                     }*/
-                    ParallelSummarise parallelSummarise = new ParallelSummarise(conn,prepStat,rs);
+                    ParallelSummarise parallelSummarise = new ParallelSummarise(queryInsertValues,rs,conn);
                     parallelSummarise.exec();
                     /*try {
                         parallelSummarise.join();
                     }catch(InterruptedException e){e.printStackTrace();}*/
                     rs.close();
-                }
+                //}
             } catch (SQLException e) {
             e.printStackTrace();
             conn.rollback();
