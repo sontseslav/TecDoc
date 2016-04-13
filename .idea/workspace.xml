@@ -7,12 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c79af5f5-8e69-4242-a930-cb3b6efbd953" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/TecDoc/concur/dbconctest/DatabaseProcessor.class" afterPath="$PROJECT_DIR$/out/production/TecDoc/concur/dbconctest/DatabaseProcessor.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/TecDoc/concur/dbconctest/ParallelSummarise.class" afterPath="$PROJECT_DIR$/out/production/TecDoc/concur/dbconctest/ParallelSummarise.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/TecDoc/concur/Runner.class" afterPath="$PROJECT_DIR$/out/production/TecDoc/concur/Runner.class" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/TecDoc/concur/dbconctest/ParallelSummarise$1.class" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java" afterPath="$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/concur/dbconctest/ParallelSummarise.java" afterPath="$PROJECT_DIR$/src/concur/dbconctest/ParallelSummarise.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/concur/Runner.java" afterPath="$PROJECT_DIR$/src/concur/Runner.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="TecDoc.iws" />
@@ -52,30 +48,30 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Runner.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Runner.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/concur/dbconctest/Runner.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.38502672">
+            <state vertical-scroll-proportion="0.0">
               <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DatabaseProcessor.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="DatabaseProcessor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="111" column="18" selection-start-line="111" selection-start-column="18" selection-end-line="111" selection-end-column="18" />
+            <state vertical-scroll-proportion="0.5187166">
+              <caret line="90" column="41" selection-start-line="90" selection-start-column="41" selection-end-line="90" selection-end-column="41" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1460567320000" expanded="true" signature="643:786" placeholder="CREATE TABLE..input..." />
-                <marker date="1460567320000" expanded="true" signature="879:921" placeholder="INSERT INTO ..." />
-                <marker date="1460567320000" expanded="true" signature="2502:2697" placeholder="SELECT COUNT..tables..." />
-                <marker date="1460567320000" expanded="true" signature="3225:3236" placeholder="DROP TABLE o..." />
-                <marker date="1460567320000" expanded="true" signature="3357:3513" placeholder="CREATE TABLE..output..." />
-                <marker date="1460567320000" expanded="true" signature="3606:3668" placeholder="INSERT INTO ..." />
-                <marker date="1460567320000" expanded="true" signature="3817:3840" placeholder="SELECT val1,..input..." />
+                <marker date="1460569572000" expanded="true" signature="643:786" placeholder="CREATE TABLE..input..." />
+                <marker date="1460569572000" expanded="true" signature="879:921" placeholder="INSERT INTO ..." />
+                <marker date="1460569572000" expanded="true" signature="2502:2697" placeholder="SELECT COUNT..tables..." />
+                <marker date="1460569572000" expanded="true" signature="3225:3236" placeholder="DROP TABLE o..." />
+                <marker date="1460569572000" expanded="true" signature="3357:3513" placeholder="CREATE TABLE..output..." />
+                <marker date="1460569572000" expanded="true" signature="3606:3668" placeholder="INSERT INTO ..." />
+                <marker date="1460569572000" expanded="true" signature="3719:3742" placeholder="SELECT val1,..input..." />
               </folding>
             </state>
           </provider>
@@ -92,6 +88,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="PUSH_TAGS">
+      <GitPushTagMode />
+    </option>
   </component>
   <component name="GradleLocalSettings">
     <option name="externalProjectsViewState">
@@ -132,8 +131,8 @@
         <option value="$PROJECT_DIR$/src/concur/dbconctest/ParalelSumarise.java" />
         <option value="$PROJECT_DIR$/src/concur/dbconctest/Runner.java" />
         <option value="$PROJECT_DIR$/src/concur/Runner.java" />
-        <option value="$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java" />
         <option value="$PROJECT_DIR$/src/concur/dbconctest/ParallelSummarise.java" />
+        <option value="$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java" />
       </list>
     </option>
   </component>
@@ -673,7 +672,7 @@
       <workItem from="1460311462659" duration="4602000" />
       <workItem from="1460390598404" duration="2070000" />
       <workItem from="1460400095737" duration="810000" />
-      <workItem from="1460564794866" duration="4506000" />
+      <workItem from="1460564794866" duration="4790000" />
     </task>
     <task id="LOCAL-00001" summary="commit 1">
       <created>1460309241034</created>
@@ -699,11 +698,17 @@
       <option name="project" value="LOCAL" />
       <updated>1460565001907</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Merge branch 'master' of https://github.com/sontseslav/TecDoc&#10;&#10;# Conflicts:&#10;#&#9;src/concur/dbconctest/ParallelSummarise.java&#10;">
+      <created>1460569326171</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1460569326171</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69891000" />
+    <option name="totallyTimeSpent" value="70175000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1280" height="996" extended-state="6" />
@@ -1152,20 +1157,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java">
+    <entry file="file://$PROJECT_DIR$/src/concur/dbconctest/Runner.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="111" column="18" selection-start-line="111" selection-start-column="18" selection-end-line="111" selection-end-column="18" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <marker date="1460567320000" expanded="true" signature="643:786" placeholder="CREATE TABLE..input..." />
-            <marker date="1460567320000" expanded="true" signature="879:921" placeholder="INSERT INTO ..." />
-            <marker date="1460567320000" expanded="true" signature="2502:2697" placeholder="SELECT COUNT..tables..." />
-            <marker date="1460567320000" expanded="true" signature="3225:3236" placeholder="DROP TABLE o..." />
-            <marker date="1460567320000" expanded="true" signature="3357:3513" placeholder="CREATE TABLE..output..." />
-            <marker date="1460567320000" expanded="true" signature="3606:3668" placeholder="INSERT INTO ..." />
-            <marker date="1460567320000" expanded="true" signature="3817:3840" placeholder="SELECT val1,..input..." />
-          </folding>
+          <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1183,11 +1179,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/concur/dbconctest/Runner.java">
+    <entry file="file://$PROJECT_DIR$/src/concur/dbconctest/DatabaseProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.38502672">
-          <caret line="12" column="30" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
-          <folding />
+        <state vertical-scroll-proportion="0.5187166">
+          <caret line="90" column="41" selection-start-line="90" selection-start-column="41" selection-end-line="90" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <marker date="1460569572000" expanded="true" signature="643:786" placeholder="CREATE TABLE..input..." />
+            <marker date="1460569572000" expanded="true" signature="879:921" placeholder="INSERT INTO ..." />
+            <marker date="1460569572000" expanded="true" signature="2502:2697" placeholder="SELECT COUNT..tables..." />
+            <marker date="1460569572000" expanded="true" signature="3225:3236" placeholder="DROP TABLE o..." />
+            <marker date="1460569572000" expanded="true" signature="3357:3513" placeholder="CREATE TABLE..output..." />
+            <marker date="1460569572000" expanded="true" signature="3606:3668" placeholder="INSERT INTO ..." />
+            <marker date="1460569572000" expanded="true" signature="3719:3742" placeholder="SELECT val1,..input..." />
+          </folding>
         </state>
       </provider>
     </entry>
