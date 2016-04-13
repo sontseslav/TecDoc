@@ -34,7 +34,7 @@ public class ParallelSummarise{
                     containerQueue.put(new Container(val1, val2));
                     counter++;
                     if (counter != 0 && (counter % 10000 == 0)) {
-                        System.out.println(counter + " objects added to container");
+                        System.out.println(counter + " objects contained");
                     }
                 }
                 while(containerQueue.size() != 0){
@@ -53,33 +53,30 @@ public class ParallelSummarise{
      */
         @Override
         public void run(){
-            while (!containerQueue.isEmpty()) {
+            while (!containerQueue.isEmpty() | isNext) {
                 boolean updated;
                 int counter;
-                boolean locked = false;
                 try {
                     long sum = containerQueue.take().getSum();
                     lock.lock();
-                    locked = true;
                     ps.setNull(1, Types.INTEGER);
                     ps.setLong(2, sum);
                     ps.setBoolean(3, false);
                     ps.executeUpdate();
-                    lock.unlock();
-                    locked = false;
-                    do {
-                        counter = rowsSet.get();
-                        updated = rowsSet.compareAndSet(counter, ++counter);
-                    } while (!updated);
-                    if (counter % 10000 == 0) {
-                        System.out.println(Thread.currentThread().getName() + " : " + counter);
-                        conn.commit();
-                    }
                 } catch (SQLException | InterruptedException e) {
                     e.printStackTrace();
                 } finally {
-                    if(locked) lock.unlock();
+                    lock.unlock();
                 }
+                do {
+                    counter = rowsSet.get();
+                    updated = rowsSet.compareAndSet(counter, ++counter);
+                } while (!updated);
+                if (counter % 10000 == 0) {
+                    System.out.println(Thread.currentThread().getName() + " : " + counter);
+                    //conn.commit();
+                }
+                
             }
         }
     }
