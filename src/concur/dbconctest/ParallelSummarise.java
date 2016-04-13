@@ -2,6 +2,7 @@ package concur.dbconctest;
 
 import java.sql.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -31,61 +32,58 @@ public class ParallelSummarise{
                     int val1 = rs.getInt(1);
                     int val2 = rs.getInt(2);
                     containerQueue.put(new Container(val1, val2));
-                    System.out.println(++counter + " objects added to container");
+                    counter++;
+                    if (counter != 0 && (counter % 10000 == 0)) {
+                        System.out.println(counter + " objects added to container");
+                    }
                 }
+                while(containerQueue.size() != 0){
+                    Thread.sleep(1000);
+                }
+                
             }catch(SQLException | InterruptedException e){e.printStackTrace();}
+            isNext = false;
+            System.out.println(Thread.currentThread().getName() + " terminated");
         }
     }
-    private class Task implements Runnable{
+    
+    private class TaskProcessQueue implements Runnable{
+    /**
+     multiply threads
+     */
         @Override
-        public void run(){//runs 138 k miliseconds
-            int val1,val2;
-            
-                while(true){
-                    //synchronized(this){
+        public void run(){
+            while (!containerQueue.isEmpty()) {
+                boolean updated;
+                int counter;
+                boolean locked = false;
+                try {
+                    long sum = containerQueue.take().getSum();
                     lock.lock();
-                    try{
-                        boolean isResultPresent = rs.next();
-                        if (!isResultPresent) {
-                            break;
-                        }
-                        val1 = rs.getInt(1);
-                        val2 = rs.getInt(2);
-                        lock.unlock();
-                        lock.lock();
-                        ps.setNull(1, Types.INTEGER);
-                        ps.setLong(2, val1 + val2);
-                        ps.setBoolean(3, false);
-                        ps.executeUpdate();
-                        if ((rowsSet % 5000) == 0 && rowsSet != 0) {
-                            System.out.println(Thread.currentThread().getName() + " : " + rowsSet);
-                            //conn.commit();
-                        }
-                        rowsSet++;
-                    }catch(SQLException e){
-                        e.printStackTrace();
-                    }finally{
-                        lock.unlock();
-                    }
-                    //}
-                }
-                /*while(rs.next()){
-                    val1 = rs.getInt(1);
-                    val2 = rs.getInt(2);
+                    locked = true;
                     ps.setNull(1, Types.INTEGER);
-                    ps.setLong(2, val1 + val2);
+                    ps.setLong(2, sum);
                     ps.setBoolean(3, false);
                     ps.executeUpdate();
-                    if((rowsSet % 5000) == 0 && rowsSet !=0){
-                        System.out.println(Thread.currentThread().getName()+" : "+rowsSet);
-                        //conn.commit();
+                    lock.unlock();
+                    locked = false;
+                    do {
+                        counter = rowsSet.get();
+                        updated = rowsSet.compareAndSet(counter, ++counter);
+                    } while (!updated);
+                    if (counter % 10000 == 0) {
+                        System.out.println(Thread.currentThread().getName() + " : " + counter);
+                        conn.commit();
                     }
-                    rowsSet++;
-                }*/
-                isNext = false;
-            
+                } catch (SQLException | InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(locked) lock.unlock();
+                }
+            }
         }
     }
+
     private final PreparedStatement ps;
     private final ResultSet rs;
     private final Connection conn;//is it needed?
@@ -93,8 +91,8 @@ public class ParallelSummarise{
     private final int maxPoolSize = 10;
     private final long keepAliveTime = 5000;
     private final Lock lock = new ReentrantLock();
-    private BlockingQueue<Container> containerQueue = new ArrayBlockingQueue<>(1024);
-    private int rowsSet;
+    private BlockingQueue<Container> containerQueue = new ArrayBlockingQueue<>(10000);
+    private AtomicInteger rowsSet = new AtomicInteger(0);
     private boolean isNext = true;
     
 
@@ -105,10 +103,13 @@ public class ParallelSummarise{
     }
 
     public void exec(){
+        Thread filler = new Thread(new TaskFillQueue());
+        filler.setName("Filler Thread");
+        filler.start();
         ExecutorService threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         for (int i = 0; i<maxPoolSize;i++){
-            threadPoolExecutor.execute(new Task());
+            threadPoolExecutor.execute(new TaskProcessQueue());
         }
         //ExecutorService threadPoolExecutor = Executors.newSingleThreadExecutor();
         //threadPoolExecutor.execute(new Task());
