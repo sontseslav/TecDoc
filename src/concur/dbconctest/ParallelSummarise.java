@@ -37,7 +37,7 @@ public class ParallelSummarise{
                         System.out.println(counter + " objects contained");
                     }
                 }
-                while(containerQueue.size() != 0){
+                while(!containerQueue.isEmpty()){
                     Thread.sleep(1000);
                 }
                 
