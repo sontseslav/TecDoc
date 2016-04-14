@@ -3,14 +3,12 @@ package concur.dbconctest;
 import java.sql.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by coder on 10.04.16.
  */
 public class ParallelSummarise{
-    private class Container{
+    private final class Container{
         private final long sum;
         public Container(int val1, int val2){
             this.sum = val1+val2;
@@ -19,8 +17,15 @@ public class ParallelSummarise{
             return this.sum;
         }
     }
-    
+
     private class TaskFillQueue implements Runnable{
+        private ResultSet rs;
+        private BlockingQueue<Container> containerQueue;
+
+        public TaskFillQueue(ResultSet rs, BlockingQueue<Container> containerQueue){
+            this.rs = rs;
+            this.containerQueue = containerQueue;
+        }
         /**
          Only one thread, no obvious blocking is needed
          */
@@ -29,9 +34,7 @@ public class ParallelSummarise{
             int counter = 0;
             try{
                 while (rs.next()) {
-                    int val1 = rs.getInt(1);
-                    int val2 = rs.getInt(2);
-                    containerQueue.put(new Container(val1, val2));
+                    containerQueue.put(new Container(rs.getInt(1), rs.getInt(2)));
                     counter++;
                     if (counter != 0 && (counter % 10000 == 0)) {
                         System.out.println(counter + " objects contained");
@@ -45,67 +48,80 @@ public class ParallelSummarise{
             System.out.println(Thread.currentThread().getName() + " terminated");
         }
     }
-    
+
     private class TaskProcessQueue implements Runnable{
-    /**
-     multiply threads
-     */
+        private BlockingQueue<Container> containerQueue;
+        private String queryInsertValues;
+        private Connection conn;
+
+        public TaskProcessQueue(BlockingQueue<Container> containerQueue,
+                                String queryInsertValues, Connection conn){
+            this.containerQueue = containerQueue;
+            this.queryInsertValues = queryInsertValues;
+            this.conn = conn;
+        }
+        /**
+         multiply threads
+         */
         @Override
         public void run(){
-            while (!containerQueue.isEmpty()) {
-                boolean updated;
-                int counter;
-                try {
-                    long sum = containerQueue.take().getSum();
-                    lock.lock();
-                    ps.setNull(1, Types.INTEGER);
-                    ps.setLong(2, sum);
-                    ps.setBoolean(3, false);
-                    ps.executeUpdate();
-                } catch (SQLException | InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    lock.unlock();
+            boolean updated;
+            int counter;
+            int i = 1;
+            try(PreparedStatement ps = conn.prepareStatement(queryInsertValues)) {
+                while (!containerQueue.isEmpty()) {
+                    try {
+                        long sum = containerQueue.take().getSum();
+                        ps.setLong(1, sum);
+                        ps.setBoolean(2, false);
+                        ps.addBatch();
+                        i++;
+                        if(i % 1000 == 0 || containerQueue.isEmpty()){
+                            ps.executeBatch();
+                        }
+                    }catch (SQLException | InterruptedException e) {e.printStackTrace();}
+                    do {
+                        counter = rowsSet.get();
+                        updated = rowsSet.compareAndSet(counter, ++counter);
+                    } while (!updated);
+                    if (counter % 10000 == 0) {
+                        System.out.println(Thread.currentThread().getName() + " : " + counter);
+                    }
                 }
-                do {
-                    counter = rowsSet.get();
-                    updated = rowsSet.compareAndSet(counter, ++counter);
-                } while (!updated);
-                if (counter % 10000 == 0) {
-                    System.out.println(Thread.currentThread().getName() + " : " + counter);
-                    //conn.commit();
-                }
-                
-            }
+            }catch (SQLException e){e.printStackTrace();}
         }
     }
-
-    private final PreparedStatement ps;
+    private final Connection conn;
+    private final String queryInsertValues;
     private final ResultSet rs;
-    private final Connection conn;//is it needed?
-    private final int corePoolSize = 5;
-    private final int maxPoolSize = 10;
-    private final long keepAliveTime = 5000;
-    private final Lock lock = new ReentrantLock();
-    private final BlockingQueue<Container> containerQueue = new ArrayBlockingQueue<>(10000);
-    private final AtomicInteger rowsSet = new AtomicInteger(0);
-    private boolean isNext = true;
-    
+    private final int corePoolSize;
+    private final int maxPoolSize;
+    private final long keepAliveTime;
+    private final BlockingQueue<Container> containerQueue;
+    private final AtomicInteger rowsSet;
+    private boolean isNext;
 
-    public ParallelSummarise(Connection conn, PreparedStatement ps, ResultSet rs){
-        this.conn = conn;
-        this.ps = ps;
+
+    public ParallelSummarise(String queryInsertValues, ResultSet rs, Connection conn){
+        this.queryInsertValues = queryInsertValues;
         this.rs = rs;
+        this.conn = conn;
+        this.corePoolSize = 5;
+        this.maxPoolSize = 10;
+        this.keepAliveTime = 5000;
+        this.containerQueue = new ArrayBlockingQueue<>(10000);
+        this.rowsSet = new AtomicInteger(0);
+        this.isNext = true;
     }
 
     public void exec(){
-        Thread filler = new Thread(new TaskFillQueue());
+        Thread filler = new Thread(new TaskFillQueue(rs,containerQueue));
         filler.setName("Filler Thread");
         filler.start();
         ExecutorService threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
         for (int i = 0; i<maxPoolSize;i++){
-            threadPoolExecutor.execute(new TaskProcessQueue());
+            threadPoolExecutor.execute(new TaskProcessQueue(containerQueue, queryInsertValues, conn));
         }
         //ExecutorService threadPoolExecutor = Executors.newSingleThreadExecutor();
         //threadPoolExecutor.execute(new Task());

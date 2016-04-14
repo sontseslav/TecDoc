@@ -11,12 +11,12 @@ package concur;
  */
 public class Runner {
     public static void main(String... args){
-        JobMaker r1 = new JobMaker(15);
+        /*JobMaker r1 = new JobMaker(15);
         Thread thr1 = new Thread(r1);
         thr1.start();
         JobMaker r2 = new JobMaker(5);
         Thread thr2 = new Thread(r2);
         thr2.start();
-                
+        */
     }
 }
