@@ -36,7 +36,7 @@ public class ParallelSummarise{
                 while (rs.next()) {
                     containerQueue.put(new Container(rs.getInt(1), rs.getInt(2)));
                     counter++;
-                    if (counter != 0 && (counter % 10000 == 0)) {
+                    if (counter != 0 && (counter % 100000 == 0)) {
                         System.out.println(counter + " objects contained");
                     }
                 }
@@ -84,7 +84,7 @@ public class ParallelSummarise{
                         counter = rowsSet.get();
                         updated = rowsSet.compareAndSet(counter, ++counter);
                     } while (!updated);
-                    if (counter % 10000 == 0) {
+                    if (counter % 100000 == 0) {
                         System.out.println(Thread.currentThread().getName() + " : " + counter);
                     }
                 }
@@ -128,7 +128,7 @@ public class ParallelSummarise{
         while(isNext){
             try{
                 Thread.sleep(5000);
-                System.out.println("waiting...");
+                //System.out.println("waiting...");
             }catch (InterruptedException e){e.printStackTrace();}
         }
         threadPoolExecutor.shutdown();

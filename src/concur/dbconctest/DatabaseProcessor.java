@@ -26,7 +26,7 @@ public class DatabaseProcessor {
                 st.execute(queryCreateTable);
                 String queryInsertValues = "INSERT INTO "+INPUT_TABLE+" VALUES (?,?,?)";
                 try(PreparedStatement prepStat = conn.prepareStatement(queryInsertValues)){
-                    int rowsToSet = (int)Math.pow(10,6);
+                    int rowsToSet = (int)Math.pow(10,9);
                     int rowsSet;
                     Random rand = new Random();
                     for(rowsSet=0;rowsSet<rowsToSet;rowsSet++){
@@ -66,7 +66,7 @@ public class DatabaseProcessor {
                     "AND table_name = '"+table+"'";
             try(ResultSet rs = st.executeQuery(queryTableExists)){
                 rs.next();
-                return (rs.getInt("COUNT(*)") > 0)?true:false;
+                return (rs.getInt("COUNT(*)") > 0);
             }
         }catch(SQLException e){
             e.printStackTrace();
