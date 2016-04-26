@@ -3,6 +3,8 @@ package concur.dbconctest;
 import java.sql.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by coder on 10.04.16.
@@ -86,7 +88,9 @@ public class ParallelSummarise{
                     } while (!updated);
                     if (counter % 100000 == 0) {
                         System.out.println(Thread.currentThread().getName() + " : " + counter);
+                        //lock.lock();
                         conn.commit();
+                        //lock.unlock();
                     }
                 }
             }catch (SQLException e){e.printStackTrace();}
@@ -101,7 +105,7 @@ public class ParallelSummarise{
     private final BlockingQueue<Container> containerQueue;
     private final AtomicInteger rowsSet;
     private boolean isNext;
-
+    //private final Lock lock = new ReentrantLock();
 
     public ParallelSummarise(String queryInsertValues, ResultSet rs, Connection conn){
         this.queryInsertValues = queryInsertValues;
@@ -116,11 +120,13 @@ public class ParallelSummarise{
     }
 
     public void exec()throws SQLException{
+        
         Thread filler = new Thread(new TaskFillQueue(rs,containerQueue));
         filler.setName("Filler Thread");
         filler.start();
         ExecutorService threadPoolExecutor = null;
         try{
+            //conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             conn.setAutoCommit(false);
             threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
                     TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
