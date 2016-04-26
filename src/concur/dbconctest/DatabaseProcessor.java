@@ -26,7 +26,7 @@ public class DatabaseProcessor {
                 st.execute(queryCreateTable);
                 String queryInsertValues = "INSERT INTO "+INPUT_TABLE+" VALUES (?,?,?)";
                 try(PreparedStatement prepStat = conn.prepareStatement(queryInsertValues)){
-                    int rowsToSet = (int)Math.pow(10,9);
+                    int rowsToSet = (int)Math.pow(10,7);
                     int rowsSet;
                     Random rand = new Random();
                     for(rowsSet=0;rowsSet<rowsToSet;rowsSet++){
@@ -76,21 +76,21 @@ public class DatabaseProcessor {
 
     public void summarize(){
         long startTime = System.currentTimeMillis();
-            try(Statement st = conn.createStatement()){
-                if(isTableExists(OUTPUT_TABLE)){
-                    st.execute("DROP TABLE "+OUTPUT_TABLE);
-                }
-                String queryCreateTable = "CREATE TABLE " + OUTPUT_TABLE + " (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
-                        "SUM BIGINT NOT NULL, is_palindrome bool NOT NULL)";
-                st.execute(queryCreateTable);
-                String queryInsertValues = "INSERT INTO "+OUTPUT_TABLE+" (SUM, is_palindrome) VALUES (?,?)";
-                ResultSet rs = st.executeQuery("SELECT val1, val2 FROM "+INPUT_TABLE);
-                ParallelSummarise parallelSummarise = new ParallelSummarise(queryInsertValues,rs,conn);
-                parallelSummarise.exec();
-            } catch (SQLException e) {
-            e.printStackTrace();
-            } finally {
-                System.out.printf("Elapsed time: %d%n", System.currentTimeMillis() - startTime);
+        try (Statement st = conn.createStatement()) {
+            if (isTableExists(OUTPUT_TABLE)) {
+                st.execute("DROP TABLE " + OUTPUT_TABLE);
             }
+            String queryCreateTable = "CREATE TABLE " + OUTPUT_TABLE + " (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,"
+                    + "SUM BIGINT NOT NULL, is_palindrome bool NOT NULL)";
+            st.execute(queryCreateTable);
+            String queryInsertValues = "INSERT INTO " + OUTPUT_TABLE + " (SUM, is_palindrome) VALUES (?,?)";
+            ResultSet rs = st.executeQuery("SELECT val1, val2 FROM " + INPUT_TABLE);
+            ParallelSummarise parallelSummarise = new ParallelSummarise(queryInsertValues, rs, conn);
+            parallelSummarise.exec();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            System.out.printf("Elapsed time: %d%n", System.currentTimeMillis() - startTime);
+        }
     }
 }
