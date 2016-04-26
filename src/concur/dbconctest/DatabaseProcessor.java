@@ -76,12 +76,10 @@ public class DatabaseProcessor {
 
     public void summarize(){
         long startTime = System.currentTimeMillis();
-        try{
             try(Statement st = conn.createStatement()){
                 if(isTableExists(OUTPUT_TABLE)){
                     st.execute("DROP TABLE "+OUTPUT_TABLE);
                 }
-                conn.setAutoCommit(false);
                 String queryCreateTable = "CREATE TABLE " + OUTPUT_TABLE + " (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                         "SUM BIGINT NOT NULL, is_palindrome bool NOT NULL)";
                 st.execute(queryCreateTable);
@@ -91,14 +89,8 @@ public class DatabaseProcessor {
                 parallelSummarise.exec();
             } catch (SQLException e) {
             e.printStackTrace();
-            conn.rollback();
             } finally {
-                conn.commit();
-                conn.setAutoCommit(true);
                 System.out.printf("Elapsed time: %d%n", System.currentTimeMillis() - startTime);
             }
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
     }
 }

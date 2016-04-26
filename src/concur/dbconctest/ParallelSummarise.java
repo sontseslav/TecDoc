@@ -86,6 +86,7 @@ public class ParallelSummarise{
                     } while (!updated);
                     if (counter % 100000 == 0) {
                         System.out.println(Thread.currentThread().getName() + " : " + counter);
+                        conn.commit();
                     }
                 }
             }catch (SQLException e){e.printStackTrace();}
@@ -114,23 +115,35 @@ public class ParallelSummarise{
         this.isNext = true;
     }
 
-    public void exec(){
+    public void exec()throws SQLException{
         Thread filler = new Thread(new TaskFillQueue(rs,containerQueue));
         filler.setName("Filler Thread");
         filler.start();
-        ExecutorService threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-        for (int i = 0; i<maxPoolSize;i++){
-            threadPoolExecutor.execute(new TaskProcessQueue(containerQueue, queryInsertValues, conn));
+        ExecutorService threadPoolExecutor = null;
+        try{
+            conn.setAutoCommit(false);
+            threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
+                    TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+            for (int i = 0; i < maxPoolSize; i++) {
+                threadPoolExecutor.execute(new TaskProcessQueue(containerQueue, queryInsertValues, conn));
+            }
+            //ExecutorService threadPoolExecutor = Executors.newSingleThreadExecutor();
+            //threadPoolExecutor.execute(new Task());
+            while (isNext) {
+                try {
+                    Thread.sleep(5000);
+                    //System.out.println("waiting...");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+            conn.rollback();
+        }finally{
+            conn.commit();
+            conn.setAutoCommit(true);
+            threadPoolExecutor.shutdown();
         }
-        //ExecutorService threadPoolExecutor = Executors.newSingleThreadExecutor();
-        //threadPoolExecutor.execute(new Task());
-        while(isNext){
-            try{
-                Thread.sleep(5000);
-                //System.out.println("waiting...");
-            }catch (InterruptedException e){e.printStackTrace();}
-        }
-        threadPoolExecutor.shutdown();
     }
 }
