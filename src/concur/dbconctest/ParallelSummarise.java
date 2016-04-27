@@ -88,9 +88,7 @@ public class ParallelSummarise{
                     } while (!updated);
                     if (counter % 100000 == 0) {
                         System.out.println(Thread.currentThread().getName() + " : " + counter);
-                        //lock.lock();
                         conn.commit();
-                        //lock.unlock();
                     }
                 }
             }catch (SQLException e){e.printStackTrace();}
@@ -105,7 +103,6 @@ public class ParallelSummarise{
     private final BlockingQueue<Container> containerQueue;
     private final AtomicInteger rowsSet;
     private boolean isNext;
-    //private final Lock lock = new ReentrantLock();
 
     public ParallelSummarise(String queryInsertValues, ResultSet rs, Connection conn){
         this.queryInsertValues = queryInsertValues;
@@ -126,7 +123,6 @@ public class ParallelSummarise{
         filler.start();
         ExecutorService threadPoolExecutor = null;
         try{
-            //conn.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
             conn.setAutoCommit(false);
             threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
                     TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
